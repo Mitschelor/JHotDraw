@@ -10,9 +10,6 @@ package org.jhotdraw.action.window;
 import java.awt.event.ActionEvent;
 import javax.swing.AbstractAction;
 import org.jhotdraw.api.gui.Arrangeable;
-import static org.jhotdraw.api.gui.Arrangeable.Arrangement.CASCADE;
-import static org.jhotdraw.api.gui.Arrangeable.Arrangement.HORIZONTAL;
-import static org.jhotdraw.api.gui.Arrangeable.Arrangement.VERTICAL;
 import org.jhotdraw.util.ResourceBundleUtil;
 
 /**

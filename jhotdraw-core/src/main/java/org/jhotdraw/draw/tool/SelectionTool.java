@@ -7,6 +7,7 @@
  */
 package org.jhotdraw.draw.tool;
 
+import dk.sdu.mmmi.featuretracer.lib.FeatureEntryPoint;
 import org.jhotdraw.draw.figure.Figure;
 import java.awt.*;
 import java.awt.event.*;
@@ -118,6 +119,7 @@ public class SelectionTool extends AbstractTool {
     /**
      * Creates a new instance.
      */
+    @FeatureEntryPoint(value = "SelectionTool")
     public SelectionTool() {
         tracker = getSelectAreaTracker();
         trackerHandler = new TrackerHandler();
@@ -130,6 +132,7 @@ public class SelectionTool extends AbstractTool {
      *
      * @param newValue The new value.
      */
+    @FeatureEntryPoint(value = "SelectionTool")
     public void setSelectBehindEnabled(boolean newValue) {
         boolean oldValue = isSelectBehindEnabled;
         isSelectBehindEnabled = newValue;
@@ -146,18 +149,21 @@ public class SelectionTool extends AbstractTool {
         return isSelectBehindEnabled;
     }
 
+    @FeatureEntryPoint(value = "SelectionTool")
     @Override
     public void activate(DrawingEditor editor) {
         super.activate(editor);
         tracker.activate(editor);
     }
 
+    @FeatureEntryPoint(value = "SelectionTool")
     @Override
     public void deactivate(DrawingEditor editor) {
         super.deactivate(editor);
         tracker.deactivate(editor);
     }
 
+    @FeatureEntryPoint(value = "SelectionTool")
     @Override
     public void keyPressed(KeyEvent e) {
         if (getView() != null && getView().isEnabled()) {
@@ -165,6 +171,7 @@ public class SelectionTool extends AbstractTool {
         }
     }
 
+    @FeatureEntryPoint(value = "SelectionTool")
     @Override
     public void keyReleased(KeyEvent evt) {
         if (getView() != null && getView().isEnabled()) {
@@ -172,6 +179,7 @@ public class SelectionTool extends AbstractTool {
         }
     }
 
+    @FeatureEntryPoint(value = "SelectionTool")
     @Override
     public void keyTyped(KeyEvent evt) {
         if (getView() != null && getView().isEnabled()) {
@@ -179,6 +187,7 @@ public class SelectionTool extends AbstractTool {
         }
     }
 
+    @FeatureEntryPoint(value = "SelectionTool")
     @Override
     public void mouseClicked(MouseEvent evt) {
         if (getView() != null && getView().isEnabled()) {
@@ -186,6 +195,7 @@ public class SelectionTool extends AbstractTool {
         }
     }
 
+    @FeatureEntryPoint(value = "SelectionTool")
     @Override
     public void mouseDragged(MouseEvent evt) {
         if (getView() != null && getView().isEnabled()) {
@@ -193,23 +203,27 @@ public class SelectionTool extends AbstractTool {
         }
     }
 
+    @FeatureEntryPoint(value = "SelectionTool")
     @Override
     public void mouseEntered(MouseEvent evt) {
         super.mouseEntered(evt);
         tracker.mouseEntered(evt);
     }
 
+    @FeatureEntryPoint(value = "SelectionTool")
     @Override
     public void mouseExited(MouseEvent evt) {
         super.mouseExited(evt);
         tracker.mouseExited(evt);
     }
 
+    @FeatureEntryPoint(value = "SelectionTool")
     @Override
     public void mouseMoved(MouseEvent evt) {
         tracker.mouseMoved(evt);
     }
 
+    @FeatureEntryPoint(value = "SelectionTool")
     @Override
     public void mouseReleased(MouseEvent evt) {
         if (getView() != null && getView().isEnabled()) {
@@ -217,11 +231,13 @@ public class SelectionTool extends AbstractTool {
         }
     }
 
+    @FeatureEntryPoint(value = "SelectionTool")
     @Override
     public void draw(Graphics2D g) {
         tracker.draw(g);
     }
 
+    @FeatureEntryPoint(value = "SelectionTool")
     @Override
     public void mousePressed(MouseEvent evt) {
         if (getView() != null && getView().isEnabled()) {
@@ -290,6 +306,7 @@ public class SelectionTool extends AbstractTool {
         }
     }
 
+    @FeatureEntryPoint(value = "SelectionTool")
     protected void setTracker(Tool newTracker) {
         if (tracker != null) {
             tracker.deactivate(getEditor());
@@ -306,6 +323,7 @@ public class SelectionTool extends AbstractTool {
      * Method to get a {@code HandleTracker} which handles user interaction
      * for the specified handle.
      */
+    @FeatureEntryPoint(value = "SelectionTool")
     protected HandleTracker getHandleTracker(Handle handle) {
         if (handleTracker == null) {
             handleTracker = new DefaultHandleTracker();
@@ -318,6 +336,7 @@ public class SelectionTool extends AbstractTool {
      * Method to get a {@code DragTracker} which handles user interaction
      * for dragging the specified figure.
      */
+    @FeatureEntryPoint(value = "SelectionTool")
     protected DragTracker getDragTracker(Figure f) {
         if (dragTracker == null) {
             dragTracker = new DefaultDragTracker();
@@ -330,6 +349,7 @@ public class SelectionTool extends AbstractTool {
      * Method to get a {@code SelectAreaTracker} which handles user interaction
      * for selecting an area on the drawing.
      */
+    @FeatureEntryPoint(value = "SelectionTool")
     protected SelectAreaTracker getSelectAreaTracker() {
         if (selectAreaTracker == null) {
             selectAreaTracker = new DefaultSelectAreaTracker();

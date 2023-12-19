@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module version="4">
   <component name="SonarLintModuleSettings">
+<<<<<<< Updated upstream
     <option name="uniqueId" value="ce6accfd-1ec1-4ddb-8396-8a972ebfefe4" />
+=======
+    <option name="uniqueId" value="fc051ce4-bd81-4100-a9f2-a82b07ffdd0c" />
+>>>>>>> Stashed changes
   </component>
 </module>
