@@ -132,7 +132,6 @@ public class SelectionTool extends AbstractTool {
      *
      * @param newValue The new value.
      */
-    @FeatureEntryPoint(value = "SelectionTool")
     public void setSelectBehindEnabled(boolean newValue) {
         boolean oldValue = isSelectBehindEnabled;
         isSelectBehindEnabled = newValue;
@@ -163,34 +162,30 @@ public class SelectionTool extends AbstractTool {
         tracker.deactivate(editor);
     }
 
-    @FeatureEntryPoint(value = "SelectionTool")
     @Override
     public void keyPressed(KeyEvent e) {
-        if (getView() != null && getView().isEnabled()) {
+        if (isViewNotNullAndEnabled()) {
             tracker.keyPressed(e);
         }
     }
 
-    @FeatureEntryPoint(value = "SelectionTool")
     @Override
     public void keyReleased(KeyEvent evt) {
-        if (getView() != null && getView().isEnabled()) {
+        if (isViewNotNullAndEnabled()) {
             tracker.keyReleased(evt);
         }
     }
 
-    @FeatureEntryPoint(value = "SelectionTool")
     @Override
     public void keyTyped(KeyEvent evt) {
-        if (getView() != null && getView().isEnabled()) {
+        if (isViewNotNullAndEnabled()) {
             tracker.keyTyped(evt);
         }
     }
 
-    @FeatureEntryPoint(value = "SelectionTool")
     @Override
     public void mouseClicked(MouseEvent evt) {
-        if (getView() != null && getView().isEnabled()) {
+        if (isViewNotNullAndEnabled()) {
             tracker.mouseClicked(evt);
         }
     }
@@ -198,7 +193,7 @@ public class SelectionTool extends AbstractTool {
     @FeatureEntryPoint(value = "SelectionTool")
     @Override
     public void mouseDragged(MouseEvent evt) {
-        if (getView() != null && getView().isEnabled()) {
+        if (isViewNotNullAndEnabled()) {
             tracker.mouseDragged(evt);
         }
     }
@@ -226,7 +221,7 @@ public class SelectionTool extends AbstractTool {
     @FeatureEntryPoint(value = "SelectionTool")
     @Override
     public void mouseReleased(MouseEvent evt) {
-        if (getView() != null && getView().isEnabled()) {
+        if (isViewNotNullAndEnabled()) {
             tracker.mouseReleased(evt);
         }
     }
@@ -237,75 +232,231 @@ public class SelectionTool extends AbstractTool {
         tracker.draw(g);
     }
 
+    /**
+     * Checks whether the associated drawing {@code view} is not null and is currently enabled.
+     * 
+     * @return {@code true} if the drawing view is not null and is enabled; otherwise, {@code false}.
+     * 
+     * @author Paweł Kasztura
+     */
+    private boolean isViewNotNullAndEnabled() {
+        return getView() != null && getView().isEnabled();
+    }
+
+    /**
+     * Checks whether the given {@code figure} is not null and is selectable.
+     * 
+     * @param figure Considered {@code Figure}
+     * 
+     * @return {@code true} if the figure is not null and is selectable; otherwise, {@code false}.
+     * 
+     * @author Paweł Kasztura
+     */
+    private boolean isFigureNotNullAndSelectable(Figure figure) {
+        return figure != null && figure.isSelectable();
+    }
+
+    /**
+     * Checks whether the given {@code figure} is not null and is not selectable.
+     * 
+     * @param figure Considered {@code Figure}
+     * 
+     * @return {@code true} if the figure is not null and is not selectable; otherwise, {@code false}.
+     * 
+     * @author Paweł Kasztura
+     */
+    private boolean isFigureNotNullAndNotSelectable(Figure figure) {
+        return figure != null && !figure.isSelectable();
+    }
+
+    /**
+     * Invoked when a mouse button is pressed within the context of the {@code SelectionTool}.
+     * This method handles the mouse press event for selection operations and delegates
+     * processing to the appropriate tools and handles within the associated drawing {@code view}.
+     *
+     * @param evt The {@code MouseEvent} representing the mouse press event.
+     * 
+     * @author Paweł Kasztura
+     */
     @FeatureEntryPoint(value = "SelectionTool")
     @Override
     public void mousePressed(MouseEvent evt) {
-        if (getView() != null && getView().isEnabled()) {
+        if (isViewNotNullAndEnabled()) {
             super.mousePressed(evt);
             DrawingView view = getView();
             Handle handle = view.findHandle(anchor);
-            Tool newTracker = null;
-            if (handle != null) {
-                newTracker = getHandleTracker(handle);
-            } else {
-                Figure figure;
-                Drawing drawing = view.getDrawing();
-                Point2D.Double p = view.viewToDrawing(anchor);
-                if (isSelectBehindEnabled()
-                        && (evt.getModifiersEx()
-                        & (InputEvent.ALT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK)) != 0) {
-                    // Select a figure behind the current selection
-                    figure = view.findFigure(anchor);
-                    while (figure != null && !figure.isSelectable()) {
-                        figure = drawing.findFigureBehind(p, figure);
-                    }
-                    HashSet<Figure> ignoredFigures = new HashSet<>(view.getSelectedFigures());
-                    ignoredFigures.add(figure);
-                    Figure figureBehind = view.getDrawing().findFigureBehind(
-                            view.viewToDrawing(anchor), ignoredFigures);
-                    if (figureBehind != null) {
-                        figure = figureBehind;
-                    }
-                } else {
-                    // Note: The search sequence used here, must be
-                    // consistent with the search sequence used by the
-                    // DefaultHandleTracker, the DefaultSelectAreaTracker and DelegationSelectionTool.
-                    // If possible, continue to work with the current selection
-                    figure = null;
-                    if (isSelectBehindEnabled()) {
-                        for (Figure f : view.getSelectedFigures()) {
-                            if (f.contains(p)) {
-                                figure = f;
-                                break;
-                            }
-                        }
-                    }
-                    // If the point is not contained in the current selection,
-                    // search for a figure in the drawing.
-                    if (figure == null) {
-                        figure = view.findFigure(anchor);
-                        while (figure != null && !figure.isSelectable()) {
-                            figure = drawing.findFigureBehind(p, figure);
-                        }
-                    }
-                }
-                if (figure != null && figure.isSelectable()) {
-                    newTracker = getDragTracker(figure);
-                } else {
-                    if (!evt.isShiftDown()) {
-                        view.clearSelection();
-                        view.setHandleDetailLevel(0);
-                    }
-                    newTracker = getSelectAreaTracker();
-                }
-            }
-            if (newTracker != null) {
-                setTracker(newTracker);
-            }
+
+            Tool newTracker = createNewTracker(handle, evt, view);
+            
+            setTracker(newTracker);
             tracker.mousePressed(evt);
         }
     }
 
+    /**
+     * Creates a new tracker tool based on the provided handle, mouse event, and drawing {@code view}. This
+     * method determines the appropriate tracker based on the handle, figure, and user interaction,
+     * ensuring dynamic tool selection within the context of the {@code SelectionTool}.
+     * 
+     * @param handle The handle associated with the mouse event, or null if none.
+     * @param evt The {@code MouseEvent} representing the user's interaction.
+     * @param view The {@code DrawingView} where the interaction occurs.
+     * 
+     * @return A {@code Tool} instance representing the newly created tracker for the given context.
+     * 
+     * @author Paweł Kasztura
+     */
+    @FeatureEntryPoint(value = "SelectionTool")
+    private Tool createNewTracker(Handle handle, MouseEvent evt, DrawingView view) {
+        Point2D.Double viewCoordinates = view.viewToDrawing(anchor);
+    
+        if (handle != null) {
+            return getHandleTracker(handle);
+        }
+
+        Figure figure = getFigure(view, viewCoordinates, evt);
+
+        if (isFigureNotNullAndSelectable(figure)) {
+            return getDragTracker(figure);
+        }
+
+        if (!evt.isShiftDown()) {
+            view.clearSelection();
+            view.setHandleDetailLevel(0);
+        }
+        
+        return getSelectAreaTracker();
+    }
+
+    /**
+     * Returns the {@code Figure} under the specified {@code view} coordinates within the given {@code DrawingView}.
+     * The method considers the option to select figures behind others when enabled and conditions for
+     * selecting behind are met. If the option is disabled or conditions are not met, it determines the
+     * {@code figure} in the current selection or the entire {@code drawing} at the specified {@code view} coordinates.
+     *
+     * @param view The {@code DrawingView} where the interaction occurs.
+     * @param viewCoordinates The {@code view} coordinates representing the point of interest.
+     * @param evt The {@code MouseEvent} triggering the {@code figure} retrieval.
+     * 
+     * @return The {@code Figure} under the specified coordinates, considering selection options.
+     * 
+     * @author Paweł Kasztura
+     */
+    @FeatureEntryPoint(value = "SelectionTool")
+    private Figure getFigure(DrawingView view, Point2D.Double viewCoordinates, MouseEvent evt) {
+        Drawing drawing = view.getDrawing();
+    
+        if (shouldSelectBehind(evt)) {
+            return selectFigureBehind(view, viewCoordinates);
+        }
+        
+        return getFigureFromCurrentSelectionOrDrawing(view, viewCoordinates, drawing);
+    }
+
+    /**
+     * Determines whether the selection behind other figures is appropriate based on the
+     * current state of the mouse event. Selection behind is enabled
+     * if the {@code ALT} or {@code CTRL} key is pressed during the mouse event.
+     * 
+     * @param evt The {@code MouseEvent} to evaluate for key modifiers and selection behind conditions.
+     * 
+     * @return {@code true} if selection behind is enabled and the {@code ALT} or {@code CTRL} key is pressed; 
+     *          otherwise, {@code false}.
+     * 
+     * @author Paweł Kasztura
+     */
+    private boolean shouldSelectBehind(MouseEvent evt) {
+        return (isSelectBehindEnabled() && (evt.isAltDown() || evt.isControlDown()));
+    }
+    
+    /**
+     * Selects and returns the {@code figure} behind the specified anchor point within the given {@code DrawingView}.
+     * The method iteratively finds the nearest selectable {@code figure} behind the anchor point, excluding
+     * any figures already selected. If no {@code figure} is found behind, it considers the entire drawing.
+     *
+     * @param view The {@code DrawingView} where the interaction occurs.
+     * @param viewCoordinates The {@code view} coordinates representing the anchor point.
+     * 
+     * @return The {@code Figure} behind the anchor point, excluding selected figures, or the nearest
+     *         selectable {@code figure} in the entire drawing. {@code Null} if no such {@code figure} is found.
+     * 
+     * @author Paweł Kasztura
+     */
+    @FeatureEntryPoint(value = "SelectionTool")
+    private Figure selectFigureBehind(DrawingView view, Point2D.Double viewCoordinates) {
+        Figure figure = view.findFigure(anchor);
+        
+        while (isFigureNotNullAndNotSelectable(figure)) {
+            figure = view.getDrawing().findFigureBehind(viewCoordinates, figure);
+        }
+    
+        HashSet<Figure> ignoredFigures = new HashSet<>(view.getSelectedFigures());
+        
+        ignoredFigures.add(figure);
+        
+        Figure figureBehind = view.getDrawing().findFigureBehind(view.viewToDrawing(anchor), ignoredFigures);
+    
+        return (figureBehind != null) ? figureBehind : figure;
+    }
+    
+    /**
+     * Determines and returns the {@code Figure} under the specified {@code view} coordinates within the given {@code DrawingView},
+     * considering the current selection first. If no {@code figure} is found in the current selection, the method
+     * iteratively finds the nearest selectable {@code figure} behind the anchor point in the entire drawing.
+     *
+     * @param view The {@code DrawingView} where the interaction occurs.
+     * @param viewCoordinates The {@code view} coordinates representing the point of interest.
+     * @param drawing The {@code Drawing} containing the figures.
+     * 
+     * @return The {@code Figure} under the specified coordinates within the current selection, or the nearest
+     *         selectable {@code figure} in the entire drawing. {@code Null} if no such {@code figure} is found.
+     * 
+     * @author Paweł Kasztura
+     */
+    @FeatureEntryPoint(value = "SelectionTool")
+    private Figure getFigureFromCurrentSelectionOrDrawing(DrawingView view, Point2D.Double viewCoordinates, Drawing drawing) {
+        Figure figure = findFigureInCurrentSelection(view, viewCoordinates);
+    
+        if (figure == null) {
+            figure = view.findFigure(anchor);
+            
+            while (isFigureNotNullAndNotSelectable(figure)) {
+                figure = drawing.findFigureBehind(viewCoordinates, figure);
+            }
+        }
+    
+        return figure;
+    }
+    
+    /**
+     * Finds and returns the {@code Figure} within the current selection that contains the specified {@code view} coordinates.
+     * If selection behind is enabled, the method iterates through the selected figures, checking if each
+     * figure contains the given coordinates and returns the first match.
+     *
+     * @param view The {@code DrawingView} containing the current selection.
+     * @param viewCoordinates The {@code view} coordinates representing the point of interest.
+     * 
+     * @return The {@code Figure} within the current selection containing the specified coordinates, or {@code null} if not found.
+     * 
+     * @author Paweł Kasztura
+     */
+    @FeatureEntryPoint(value = "SelectionTool")
+    private Figure findFigureInCurrentSelection(DrawingView view, Point2D.Double viewCoordinates) {
+        if (isSelectBehindEnabled()) {
+            for (Figure f : view.getSelectedFigures()) {
+                if (f.contains(viewCoordinates)) {
+                    return f;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Sets the active {@code tool} for tracking user interactions.
+     * 
+     * @param newTracker The new {@code Tool} instance to be set as the active tracker.
+     */
     @FeatureEntryPoint(value = "SelectionTool")
     protected void setTracker(Tool newTracker) {
         if (tracker != null) {
@@ -336,7 +487,6 @@ public class SelectionTool extends AbstractTool {
      * Method to get a {@code DragTracker} which handles user interaction
      * for dragging the specified figure.
      */
-    @FeatureEntryPoint(value = "SelectionTool")
     protected DragTracker getDragTracker(Figure f) {
         if (dragTracker == null) {
             dragTracker = new DefaultDragTracker();
