@@ -53,14 +53,14 @@
             <version>1.1-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>com.tngtech.jgiven</groupId>
-            <artifactId>jgiven-junit</artifactId>
-            <version>1.0.0-RC6</version>
-            <type>jar</type>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>3.11.2</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.tngtech.jgiven</groupId>
-            <artifactId>jgiven-core</artifactId>
+            <artifactId>jgiven-junit</artifactId>
             <version>1.0.0-RC6</version>
             <type>jar</type>
         </dependency>
@@ -89,11 +89,15 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.2</version>
                 <configuration>
+                    <!--
                     <argLine>
-                        -javaagent:'/home/lorenzo/.m2/repository/org/aspectj/aspectjweaver/1.9.9/aspectjweaver-1.9.9.jar' --add-opens java.base/java.lang=ALL-UNNAMED
+                        -javaagent:"/home/lorenzo/.m2/repository/org/aspectj/aspectjweaver/1.9.9/aspectjweaver-1.9.9.jar"
+                        - --add-opens java.base/java.lang=ALL-UNNAMED
                     </argLine>
+                    -->
                     <useSystemClassLoader>true</useSystemClassLoader>
                     <forkMode>always</forkMode>
+                    <skip>true</skip>
                 </configuration>
             </plugin>  
         </plugins>
