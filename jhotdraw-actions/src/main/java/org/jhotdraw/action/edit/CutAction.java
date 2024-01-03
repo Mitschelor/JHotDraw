@@ -7,6 +7,7 @@
  */
 package org.jhotdraw.action.edit;
 
+import dk.sdu.mmmi.featuretracer.lib.FeatureEntryPoint;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -38,6 +39,8 @@ public class CutAction extends AbstractSelectionAction {
     /**
      * Creates a new instance which acts on the currently focused component.
      */
+        @FeatureEntryPoint(value="CutAction")
+
     public CutAction() {
         this(null);
     }
@@ -48,6 +51,9 @@ public class CutAction extends AbstractSelectionAction {
      * @param target The target of the action. Specify null for the currently
      * focused component.
      */
+    
+    @FeatureEntryPoint(value="CutAction")
+
     public CutAction(JComponent target) {
         super(target);
         ResourceBundleUtil labels = ResourceBundleUtil.getBundle("org.jhotdraw.action.Labels");
@@ -55,13 +61,10 @@ public class CutAction extends AbstractSelectionAction {
     }
 
     @Override
+        @FeatureEntryPoint(value="CutAction")
+
     public void actionPerformed(ActionEvent evt) {
-        JComponent c = target;
-        if (c == null && (KeyboardFocusManager.getCurrentKeyboardFocusManager().
-                getPermanentFocusOwner() instanceof JComponent)) {
-            c = (JComponent) KeyboardFocusManager.getCurrentKeyboardFocusManager().
-                    getPermanentFocusOwner();
-        }
+        JComponent c = getFocusedComponent();
         if (c != null && c.isEnabled()) {
             c.getTransferHandler().exportToClipboard(
                     c,
@@ -69,4 +72,15 @@ public class CutAction extends AbstractSelectionAction {
                     TransferHandler.MOVE);
         }
     }
+
+    private JComponent getFocusedComponent() {
+        JComponent c = target;
+        if (c == null && (KeyboardFocusManager.getCurrentKeyboardFocusManager().
+                getPermanentFocusOwner() instanceof JComponent)) {
+            c = (JComponent) KeyboardFocusManager.getCurrentKeyboardFocusManager().
+                    getPermanentFocusOwner();
+        }
+        return c;
+    }
+
 }

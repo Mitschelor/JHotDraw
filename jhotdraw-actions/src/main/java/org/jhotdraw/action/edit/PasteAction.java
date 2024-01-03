@@ -7,6 +7,7 @@
  */
 package org.jhotdraw.action.edit;
 
+import dk.sdu.mmmi.featuretracer.lib.FeatureEntryPoint;
 import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.event.*;
@@ -39,6 +40,8 @@ public class PasteAction extends AbstractSelectionAction {
     /**
      * Creates a new instance which acts on the currently focused component.
      */
+    
+ @FeatureEntryPoint(value="PasteAction")
     public PasteAction() {
         this(null);
     }
@@ -49,30 +52,39 @@ public class PasteAction extends AbstractSelectionAction {
      * @param target The target of the action. Specify null for the currently
      * focused component.
      */
+                @FeatureEntryPoint(value="PasteAction")
+
     public PasteAction(JComponent target) {
         super(target);
         ResourceBundleUtil labels = ResourceBundleUtil.getBundle("org.jhotdraw.action.Labels");
         labels.configureAction(this, ID);
     }
-
+ @FeatureEntryPoint(value="PasteAction")
     @Override
     public void actionPerformed(ActionEvent evt) {
+        JComponent c = getFocusedComponent();
+        performPasteAction(c);
+    }
+
+    private JComponent getFocusedComponent() {
         JComponent c = target;
         if (c == null && (KeyboardFocusManager.getCurrentKeyboardFocusManager().
                 getPermanentFocusOwner() instanceof JComponent)) {
             c = (JComponent) KeyboardFocusManager.getCurrentKeyboardFocusManager().
                     getPermanentFocusOwner();
         }
+        return c;
+    }
+
+    private void performPasteAction(JComponent c) {
         if (c != null && c.isEnabled()) {
             Transferable t = ClipboardUtil.getClipboard().getContents(c);
             if (t != null && c.getTransferHandler() != null) {
-                c.getTransferHandler().importData(
-                        c,
-                        t);
+                c.getTransferHandler().importData(c, t);
             }
         }
     }
-
+ @FeatureEntryPoint(value="PasteAction")
     @Override
     protected void updateEnabled() {
         if (target != null) {

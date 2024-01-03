@@ -7,6 +7,7 @@
  */
 package org.jhotdraw.action.edit;
 
+import dk.sdu.mmmi.featuretracer.lib.FeatureEntryPoint;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -53,6 +54,8 @@ public class DuplicateAction extends AbstractSelectionAction {
     /**
      * Creates a new instance which acts on the currently focused component.
      */
+    @FeatureEntryPoint(value="DuplicateAction")
+
     public DuplicateAction() {
         this(null);
     }
@@ -63,20 +66,35 @@ public class DuplicateAction extends AbstractSelectionAction {
      * @param target The target of the action. Specify null for the currently
      * focused component.
      */
+    
+    @FeatureEntryPoint(value="DuplicateAction")
+
     public DuplicateAction(JComponent target) {
         super(target);
         ResourceBundleUtil labels = ResourceBundleUtil.getBundle("org.jhotdraw.action.Labels");
         labels.configureAction(this, ID);
     }
+    @FeatureEntryPoint(value="DuplicateAction")
+    
 
     @Override
-    public void actionPerformed(ActionEvent evt) {
+    
+       public void actionPerformed(ActionEvent evt) {
+        JComponent c = getFocusedComponent();
+        handleDuplicateAction(c);
+    }
+
+    private JComponent getFocusedComponent() {
         JComponent c = target;
         if (c == null && (KeyboardFocusManager.getCurrentKeyboardFocusManager().
                 getPermanentFocusOwner() instanceof JComponent)) {
             c = (JComponent) KeyboardFocusManager.getCurrentKeyboardFocusManager().
                     getPermanentFocusOwner();
         }
+        return c;
+    }
+
+    private void handleDuplicateAction(JComponent c) {
         if (c != null && c.isEnabled()) {
             if (c instanceof EditableComponent) {
                 ((EditableComponent) c).duplicate();
@@ -85,4 +103,5 @@ public class DuplicateAction extends AbstractSelectionAction {
             }
         }
     }
+
 }
