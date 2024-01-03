@@ -12,6 +12,8 @@ import java.awt.event.*;
 import javax.swing.*;
 import org.jhotdraw.datatransfer.ClipboardUtil;
 import org.jhotdraw.util.*;
+import dk.sdu.mmmi.featuretracer.lib.FeatureEntryPoint;
+
 
 /**
  * Copies the selected region and place its contents into the system clipboard.
@@ -31,6 +33,8 @@ import org.jhotdraw.util.*;
  * @version $Id$
  */
 public class CopyAction extends AbstractSelectionAction {
+    
+    
 
     private static final long serialVersionUID = 1L;
     public static final String ID = "edit.copy";
@@ -38,6 +42,7 @@ public class CopyAction extends AbstractSelectionAction {
     /**
      * Creates a new instance which acts on the currently focused component.
      */
+@FeatureEntryPoint(value="CopyAction")
     public CopyAction() {
         this(null);
     }
@@ -48,26 +53,38 @@ public class CopyAction extends AbstractSelectionAction {
      * @param target The target of the action. Specify null for the currently
      * focused component.
      */
+        @FeatureEntryPoint(value="CopyAction")
+
     public CopyAction(JComponent target) {
         super(target);
         ResourceBundleUtil labels = ResourceBundleUtil.getBundle("org.jhotdraw.action.Labels");
         labels.configureAction(this, ID);
     }
-
+@FeatureEntryPoint(value="CopyAction")
     @Override
+
     public void actionPerformed(ActionEvent evt) {
+        JComponent c = getFocusedComponent();
+        performCopyAction(c);
+    }
+
+    private JComponent getFocusedComponent() {
         JComponent c = target;
         if (c == null && (KeyboardFocusManager.getCurrentKeyboardFocusManager().
                 getPermanentFocusOwner() instanceof JComponent)) {
             c = (JComponent) KeyboardFocusManager.getCurrentKeyboardFocusManager().
                     getPermanentFocusOwner();
         }
-        // Note: copying is allowed for disabled components
-        if (c != null) {
-            c.getTransferHandler().exportToClipboard(
-                    c,
+        return c;
+    }
+
+    private void performCopyAction(JComponent component) {
+        if (component != null) {
+            component.getTransferHandler().exportToClipboard(
+                    component,
                     ClipboardUtil.getClipboard(),
                     TransferHandler.COPY);
         }
     }
+
 }
