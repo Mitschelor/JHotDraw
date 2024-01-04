@@ -12,6 +12,7 @@ import org.jhotdraw.draw.figure.Figure;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Point2D;
+import java.util.Collections;
 import java.util.HashSet;
 import org.jhotdraw.draw.*;
 import org.jhotdraw.draw.event.ToolAdapter;
@@ -239,7 +240,7 @@ public class SelectionTool extends AbstractTool {
      * 
      * @author Paweł Kasztura
      */
-    private boolean isViewNotNullAndEnabled() {
+    protected boolean isViewNotNullAndEnabled() {
         return getView() != null && getView().isEnabled();
     }
 
@@ -252,7 +253,7 @@ public class SelectionTool extends AbstractTool {
      * 
      * @author Paweł Kasztura
      */
-    private boolean isFigureNotNullAndSelectable(Figure figure) {
+    protected boolean isFigureNotNullAndSelectable(Figure figure) {
         return figure != null && figure.isSelectable();
     }
 
@@ -265,7 +266,7 @@ public class SelectionTool extends AbstractTool {
      * 
      * @author Paweł Kasztura
      */
-    private boolean isFigureNotNullAndNotSelectable(Figure figure) {
+    protected boolean isFigureNotNullAndNotSelectable(Figure figure) {
         return figure != null && !figure.isSelectable();
     }
 
@@ -296,7 +297,8 @@ public class SelectionTool extends AbstractTool {
     /**
      * Creates a new tracker tool based on the provided handle, mouse event, and drawing {@code view}. This
      * method determines the appropriate tracker based on the handle, figure, and user interaction,
-     * ensuring dynamic tool selection within the context of the {@code SelectionTool}.
+     * ensuring dynamic tool selection within the context of the {@code SelectionTool}. It also handles the event of
+     * not holding the {@code shift} key to clear the selection
      * 
      * @param handle The handle associated with the mouse event, or null if none.
      * @param evt The {@code MouseEvent} representing the user's interaction.
@@ -307,8 +309,8 @@ public class SelectionTool extends AbstractTool {
      * @author Paweł Kasztura
      */
     @FeatureEntryPoint(value = "SelectionTool")
-    private Tool createNewTracker(Handle handle, MouseEvent evt, DrawingView view) {
-        Point2D.Double viewCoordinates = view.viewToDrawing(anchor);
+    protected Tool createNewTracker(Handle handle, MouseEvent evt, DrawingView view) {
+        Point2D.Double viewCoordinates = view.viewToDrawing(new Point());
     
         if (handle != null) {
             return getHandleTracker(handle);
@@ -343,7 +345,7 @@ public class SelectionTool extends AbstractTool {
      * @author Paweł Kasztura
      */
     @FeatureEntryPoint(value = "SelectionTool")
-    private Figure getFigure(DrawingView view, Point2D.Double viewCoordinates, MouseEvent evt) {
+    protected Figure getFigure(DrawingView view, Point2D.Double viewCoordinates, MouseEvent evt) {
         Drawing drawing = view.getDrawing();
     
         if (shouldSelectBehind(evt)) {
@@ -356,17 +358,17 @@ public class SelectionTool extends AbstractTool {
     /**
      * Determines whether the selection behind other figures is appropriate based on the
      * current state of the mouse event. Selection behind is enabled
-     * if the {@code ALT} or {@code CTRL} key is pressed during the mouse event.
+     * if the {@code CTRL} key is pressed during the mouse event.
      * 
-     * @param evt The {@code MouseEvent} to evaluate for key modifiers and selection behind conditions.
+     * @param evt The {@code MouseEvent} to evaluate for key modifier and selection behind conditions.
      * 
-     * @return {@code true} if selection behind is enabled and the {@code ALT} or {@code CTRL} key is pressed; 
+     * @return {@code true} if selection behind is enabled and the {@code CTRL} key is pressed; 
      *          otherwise, {@code false}.
      * 
      * @author Paweł Kasztura
      */
-    private boolean shouldSelectBehind(MouseEvent evt) {
-        return (isSelectBehindEnabled() && (evt.isAltDown() || evt.isControlDown()));
+    protected boolean shouldSelectBehind(MouseEvent evt) {
+        return isSelectBehindEnabled() && evt.isControlDown();
     }
     
     /**
@@ -383,7 +385,7 @@ public class SelectionTool extends AbstractTool {
      * @author Paweł Kasztura
      */
     @FeatureEntryPoint(value = "SelectionTool")
-    private Figure selectFigureBehind(DrawingView view, Point2D.Double viewCoordinates) {
+    protected Figure selectFigureBehind(DrawingView view, Point2D.Double viewCoordinates) {
         Figure figure = view.findFigure(anchor);
         
         while (isFigureNotNullAndNotSelectable(figure)) {
@@ -414,7 +416,7 @@ public class SelectionTool extends AbstractTool {
      * @author Paweł Kasztura
      */
     @FeatureEntryPoint(value = "SelectionTool")
-    private Figure getFigureFromCurrentSelectionOrDrawing(DrawingView view, Point2D.Double viewCoordinates, Drawing drawing) {
+    protected Figure getFigureFromCurrentSelectionOrDrawing(DrawingView view, Point2D.Double viewCoordinates, Drawing drawing) {
         Figure figure = findFigureInCurrentSelection(view, viewCoordinates);
     
         if (figure == null) {
@@ -441,7 +443,7 @@ public class SelectionTool extends AbstractTool {
      * @author Paweł Kasztura
      */
     @FeatureEntryPoint(value = "SelectionTool")
-    private Figure findFigureInCurrentSelection(DrawingView view, Point2D.Double viewCoordinates) {
+    protected Figure findFigureInCurrentSelection(DrawingView view, Point2D.Double viewCoordinates) {
         if (isSelectBehindEnabled()) {
             for (Figure f : view.getSelectedFigures()) {
                 if (f.contains(viewCoordinates)) {
@@ -479,7 +481,15 @@ public class SelectionTool extends AbstractTool {
         if (handleTracker == null) {
             handleTracker = new DefaultHandleTracker();
         }
-        handleTracker.setHandles(handle, getView().getCompatibleHandles(handle));
+
+        DrawingView view = getView();
+        if (view != null) {
+            handleTracker.setHandles(handle, view.getCompatibleHandles(handle));
+        } else {
+            // Handle the case where getView() returns null (provide a default behavior or throw an exception)
+            handleTracker.setHandles(handle, Collections.emptyList());
+        }
+
         return handleTracker;
     }
 
