@@ -7,6 +7,7 @@
  */
 package org.jhotdraw.draw.action;
 
+import dk.sdu.mmmi.featuretracer.lib.FeatureEntryPoint;
 import org.jhotdraw.draw.DrawingEditor;
 import org.jhotdraw.draw.DrawingView;
 import org.jhotdraw.draw.figure.CompositeFigure;
@@ -32,10 +33,12 @@ public class GroupAction extends AbstractSelectedAction {
   /**
    * Creates a new instance.
    */
+  @FeatureEntryPoint("Grouping")
   public GroupAction(DrawingEditor editor) {
     this(editor, new GroupFigure());
   }
 
+  @FeatureEntryPoint("Grouping")
   public GroupAction(DrawingEditor editor, CompositeFigure prototype) {
     super(editor);
     this.prototype = prototype;
@@ -56,6 +59,7 @@ public class GroupAction extends AbstractSelectedAction {
   }
 
   @Override
+  @FeatureEntryPoint("Grouping")
   public void actionPerformed(java.awt.event.ActionEvent e) {
     if (canGroup()) {
       final DrawingView view = getView();
