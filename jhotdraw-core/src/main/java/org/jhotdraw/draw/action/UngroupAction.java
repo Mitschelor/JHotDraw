@@ -7,6 +7,7 @@
  */
 package org.jhotdraw.draw.action;
 
+import dk.sdu.mmmi.featuretracer.lib.FeatureEntryPoint;
 import org.jhotdraw.draw.DrawingEditor;
 import org.jhotdraw.draw.DrawingView;
 import org.jhotdraw.draw.figure.CompositeFigure;
@@ -34,6 +35,7 @@ public class UngroupAction extends AbstractSelectedAction {
   /**
    * Creates a new instance.
    */
+  @FeatureEntryPoint("Grouping")
   public UngroupAction(DrawingEditor editor) {
     super(editor);
     ResourceBundleUtil labels = ResourceBundleUtil.getBundle(
@@ -42,6 +44,7 @@ public class UngroupAction extends AbstractSelectedAction {
     updateEnabledState();
   }
 
+  @FeatureEntryPoint("Grouping")
   public UngroupAction(DrawingEditor editor, CompositeFigure prototype) {
     super(editor);
     this.prototype = prototype;
@@ -66,6 +69,7 @@ public class UngroupAction extends AbstractSelectedAction {
   }
 
   @Override
+  @FeatureEntryPoint("Grouping")
   public void actionPerformed(ActionEvent e) {
     if (canUngroup()) {
       final DrawingView view = getView();
