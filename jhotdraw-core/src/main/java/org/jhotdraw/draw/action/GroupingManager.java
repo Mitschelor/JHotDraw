@@ -14,6 +14,9 @@ public class GroupingManager {
 
   public GroupingManager(DrawingView view, CompositeFigure group,
                          Collection<Figure> figures) {
+    if (view == null || group == null || figures == null) {
+      throw new IllegalArgumentException("Arguments must not be null.");
+    }
     this.view = view;
     this.group = group;
     this.figures = figures;
@@ -22,6 +25,9 @@ public class GroupingManager {
 
   public void groupFigures() {
     Collection<Figure> sorted = view.getDrawing().sort(figures);
+    if (figures.isEmpty()) {
+      return;
+    }
     int index = view.getDrawing().indexOf(sorted.iterator().next());
     view.getDrawing().basicRemoveAll(figures);
     view.clearSelection();
@@ -37,6 +43,9 @@ public class GroupingManager {
 
   public Collection<Figure> ungroupFigures() {
     LinkedList<Figure> figures = new LinkedList<>(group.getChildren());
+    if (figures.isEmpty()) {
+      return figures;
+    }
     view.clearSelection();
     group.basicRemoveAllChildren();
     view.getDrawing().basicAddAll(view.getDrawing().indexOf(group), figures);
