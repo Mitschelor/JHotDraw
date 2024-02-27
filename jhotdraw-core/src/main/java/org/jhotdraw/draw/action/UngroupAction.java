@@ -68,19 +68,18 @@ public class UngroupAction extends AbstractSelectedAction {
     }
 
     protected boolean canUngroup() {
-        if (prototype == null) {
+        if (prototype == null || getView() == null || getView().getSelectionCount() != 1) {
             return false;
         }
         DrawingView view = getView();
         Set<Figure> selectedFigures = view.getSelectedFigures();
         Iterator<Figure> i = selectedFigures.iterator();
         Figure figure = i.next();
-        boolean equalClasses = figure.getClass()
+        boolean prototypeIsSameAsFigure = figure.getClass()
                 .equals(
                         prototype.getClass());
-        return getView() != null
-                && getView().getSelectionCount() == 1
-                && equalClasses;
+
+        return prototypeIsSameAsFigure;
     }
 
     @Override

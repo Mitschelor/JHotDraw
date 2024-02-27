@@ -18,19 +18,10 @@ import static org.mockito.Mockito.*;
 import static org.testng.AssertJUnit.assertEquals;
 
 public class GroupingManagerTest {
-    @Mock
     private DrawingView drawingView;
-
-    @Mock
     private CompositeFigure group;
-
-    @Mock
     private Figure figure1;
-
-    @Mock
     private Figure figure2;
-
-    @Mock
     private Drawing drawing;
 
     @Before
@@ -106,14 +97,14 @@ public class GroupingManagerTest {
         groupingManager.groupFigures();
 
         verify(drawingView.getDrawing(), times(1)).sort(figures);
-        verify(drawing, times(0)).indexOf(any(Figure.class));
-        verify(drawing, times(0)).basicRemoveAll(figures);
-        verify(drawingView, times(0)).addToSelection(group);
-        verify(drawing, times(0)).add(anyInt(), any(Figure.class));
-        verify(group, times(0)).willChange();
-        verify(group, times(0)).basicAdd(any(Figure.class));
-        verify(group, times(0)).changed();
-        verify(drawingView, times(0)).addToSelection(group);
+        verify(drawing, never()).indexOf(any(Figure.class));
+        verify(drawing, never()).basicRemoveAll(figures);
+        verify(drawingView, never()).addToSelection(group);
+        verify(drawing, never()).add(anyInt(), any(Figure.class));
+        verify(group, never()).willChange();
+        verify(group, never()).basicAdd(any(Figure.class));
+        verify(group, never()).changed();
+        verify(drawingView, never()).addToSelection(group);
     }
 
     @Test

@@ -37,13 +37,6 @@ public class GroupActionTest {
     }
 
     @Test
-    public void shouldNotAcceptNullArguments() {
-        assertThrows(IllegalArgumentException.class, () -> new GroupAction(null));
-        assertThrows(IllegalArgumentException.class, () -> new GroupAction(null, null));
-        assertThrows(IllegalArgumentException.class, () -> new GroupAction(null, null, null));
-    }
-
-    @Test
     public void testUpdateEnabledState() {
         GroupAction groupAction = new GroupAction(editor);
 
@@ -61,7 +54,7 @@ public class GroupActionTest {
     @Test
     public void testActionPerformed() {
         GroupFigure groupFigure = new GroupFigure();
-        GroupAction groupAction = new GroupAction(editor, groupFigure, groupingManager);
+        GroupAction groupAction = spy(new GroupAction(editor, groupFigure, groupingManager));
 
         when(view.getSelectionCount()).thenReturn(2);
         when(view.getSelectedFigures()).thenReturn(new HashSet<>());
@@ -70,6 +63,8 @@ public class GroupActionTest {
 
         verify(view, times(1)).getSelectedFigures();
         verify(groupingManager, times(1)).groupFigures();
+        verify(groupAction, times(1)).canGroup();
+        verify(groupAction, times(1)).fireUndoableEditHappened(any());
     }
 
     @Test

@@ -22,6 +22,7 @@ public class UndoableGroupEditTest {
         assertNotNull(undoableGroupEdit);
     }
 
+    @SuppressWarnings("DataFlowIssue")
     @Test
     public void shouldNotAcceptNullArguments() {
         assertThrows(IllegalArgumentException.class, () -> new UndoableGroupEdit(null));

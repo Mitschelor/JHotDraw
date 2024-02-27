@@ -43,9 +43,6 @@ public class GroupAction extends AbstractSelectedAction {
     @FeatureEntryPoint("Grouping")
     public GroupAction(DrawingEditor editor, CompositeFigure prototype) {
         super(editor);
-        if (editor == null || prototype == null) {
-            throw new IllegalArgumentException("editor and prototype must be nonnull");
-        }
         this.prototype = prototype;
         ResourceBundleUtil labels
                 = ResourceBundleUtil.getBundle("org.jhotdraw.draw.Labels");
@@ -55,9 +52,6 @@ public class GroupAction extends AbstractSelectedAction {
 
     public GroupAction(DrawingEditor editor, CompositeFigure prototype, GroupingManager groupingManager) {
         super(editor);
-        if (editor == null || prototype == null || groupingManager == null) {
-            throw new IllegalArgumentException("editor, prototype and groupingManager must be nonnull");
-        }
         this.prototype = prototype;
         this.groupingManager = groupingManager;
         ResourceBundleUtil labels

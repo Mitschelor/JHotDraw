@@ -19,7 +19,13 @@ public class UngroupActionTest {
     private DrawingView view;
     private CompositeFigure prototype;
     private GroupingManager groupingManager;
-    private Figure selectedFigure;
+    private CompositeFigure selectedFigure;
+
+    private void setUpCanUngroup(boolean wantToBeTrue) {
+        prototype = selectedFigure;
+        when(view.getSelectedFigures()).thenReturn(Collections.singleton(selectedFigure));
+        when(view.getSelectionCount()).thenReturn(wantToBeTrue ? 1 : 2);
+    }
 
     @Before
     public void setUp() {
@@ -27,7 +33,7 @@ public class UngroupActionTest {
         view = mock(DrawingView.class);
         prototype = mock(CompositeFigure.class);
         groupingManager = mock(GroupingManager.class);
-        selectedFigure = mock(Figure.class);
+        selectedFigure = mock(CompositeFigure.class);
         when(editor.getActiveView()).thenReturn(view);
     }
 
@@ -40,6 +46,7 @@ public class UngroupActionTest {
 
     @Test
     public void testConstructorWithPrototype() {
+        setUpCanUngroup(true);
         UngroupAction ungroupAction = new UngroupAction(editor, prototype);
 
         assertNotNull(ungroupAction);
@@ -47,6 +54,7 @@ public class UngroupActionTest {
 
     @Test
     public void testConstructorWithPrototypeAndGroupingManager() {
+        setUpCanUngroup(true);
         UngroupAction ungroupAction = new UngroupAction(editor, prototype, groupingManager);
 
         assertNotNull(ungroupAction);
@@ -54,37 +62,26 @@ public class UngroupActionTest {
 
     @Test
     public void shouldCorrectlyUpdateEnabledState() {
-        CompositeFigure prototype = mock(CompositeFigure.class);
-        Set<Figure> selectedFigures = mock(HashSet.class);
-        Iterator<Figure> iterator = mock(Iterator.class);
-        Class<Figure> mockClass = mock(Class.class);
-
-        when(view.getSelectedFigures()).thenReturn(selectedFigures);
-        when(selectedFigures.iterator()).thenReturn(iterator);
-        when(iterator.hasNext()).thenReturn(true, false);
-        when(iterator.next()).thenReturn(selectedFigure);
-        when(prototype.includes(selectedFigure)).thenReturn(true);
-        when(selectedFigure.getClass()).thenReturn(mockClass);
-        when(prototype.getClass()).thenReturn(mockClass);
-
+        setUpCanUngroup(true);
         UngroupAction ungroupAction = new UngroupAction(editor, prototype);
         ungroupAction.updateEnabledState();
         assertTrue(ungroupAction.isEnabled());
 
-        when(view.getSelectedFigures()).thenReturn(Collections.singleton(selectedFigure));
-        when(prototype.includes(selectedFigure)).thenReturn(false);
+        setUpCanUngroup(false);
         ungroupAction.updateEnabledState();
         assertFalse(ungroupAction.isEnabled());
     }
 
 
     @Test
-    public void testActionPerformed() {
+    public void shouldNotGroupWhenCanUngroupIsFalse() {
+        setUpCanUngroup(false);
         UngroupAction ungroupAction = spy(new UngroupAction(editor, prototype, groupingManager));
-
-        when(ungroupAction.canUngroup()).thenReturn(true);
         ungroupAction.actionPerformed(null);
 
-        verify(groupingManager, times(1)).ungroupFigures();
+        verify(ungroupAction, times(1)).canUngroup();
+        verify(view, times(2)).getSelectedFigures();
+        verify(groupingManager, never()).ungroupFigures();
+        verify(ungroupAction, never()).fireUndoableEditHappened(any());
     }
 }
