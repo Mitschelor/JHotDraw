@@ -4,17 +4,21 @@ import org.jhotdraw.util.ResourceBundleUtil;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
-abstract public class UndoableGroupOrUngroupEdit extends AbstractUndoableEdit {
-  private static final long serialVersionUID = 1L;
-  protected GroupingManager groupingManager;
+public abstract class UndoableGroupOrUngroupEdit extends AbstractUndoableEdit {
+    private static final long serialVersionUID = 1L;
+    protected transient GroupingManager groupingManager;
 
-  public UndoableGroupOrUngroupEdit(GroupingManager groupingManager) {
-    this.groupingManager = groupingManager;
-  }
+    protected UndoableGroupOrUngroupEdit(GroupingManager groupingManager) {
+        if (groupingManager == null) {
+            throw new IllegalArgumentException("groupingManager must be nonnull");
+        }
+        this.groupingManager = groupingManager;
+    }
 
-  public String getPresentationName() {
-    ResourceBundleUtil labels
-            = ResourceBundleUtil.getBundle("org.jhotdraw.draw.Labels");
-    return labels.getString("edit.groupSelection.text");
-  }
+    @Override
+    public String getPresentationName() {
+        ResourceBundleUtil labels
+                = ResourceBundleUtil.getBundle("org.jhotdraw.draw.Labels");
+        return labels.getString("edit.groupSelection.text");
+    }
 }
