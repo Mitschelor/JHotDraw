@@ -5,10 +5,9 @@ import org.jhotdraw.draw.DrawingView;
 import org.jhotdraw.draw.figure.CompositeFigure;
 import org.jhotdraw.draw.figure.Figure;
 import org.junit.Before;
+import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.Test;
 import org.mockito.Mock;
 
 import java.util.ArrayList;
@@ -20,19 +19,28 @@ import static org.testng.AssertJUnit.assertEquals;
 
 public class GroupingManagerTest {
     @Mock
-    private DrawingView drawingView = mock(DrawingView.class);
+    private DrawingView drawingView;
 
     @Mock
-    private CompositeFigure group = mock(CompositeFigure.class);
+    private CompositeFigure group;
 
     @Mock
-    private Figure figure1 = mock(Figure.class);
+    private Figure figure1;
 
     @Mock
-    private Figure figure2 = mock(Figure.class);
+    private Figure figure2;
 
     @Mock
-    private Drawing drawing = mock(Drawing.class);
+    private Drawing drawing;
+
+    @Before
+    public void setUp() {
+        drawingView = mock(DrawingView.class);
+        group = mock(CompositeFigure.class);
+        figure1 = mock(Figure.class);
+        figure2 = mock(Figure.class);
+        drawing = mock(Drawing.class);
+    }
 
     @Test
     public void shouldCorrectlyGroupFigures() {
@@ -96,7 +104,16 @@ public class GroupingManagerTest {
 
         GroupingManager groupingManager = new GroupingManager(drawingView, group, figures);
         groupingManager.groupFigures();
+
         verify(drawingView.getDrawing(), times(1)).sort(figures);
+        verify(drawing, times(0)).indexOf(any(Figure.class));
+        verify(drawing, times(0)).basicRemoveAll(figures);
+        verify(drawingView, times(0)).addToSelection(group);
+        verify(drawing, times(0)).add(anyInt(), any(Figure.class));
+        verify(group, times(0)).willChange();
+        verify(group, times(0)).basicAdd(any(Figure.class));
+        verify(group, times(0)).changed();
+        verify(drawingView, times(0)).addToSelection(group);
     }
 
     @Test
@@ -113,19 +130,19 @@ public class GroupingManagerTest {
         assertEquals(figures, returnedFigures);
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void shouldNotAllowConstructingGroupingManagerWithNullView() {
         List<Figure> figures = new ArrayList<>();
         new GroupingManager(null, group, figures);
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void shouldNotAllowConstructingGroupingManagerWithNullGroup() {
         List<Figure> figures = new ArrayList<>();
         new GroupingManager(drawingView, null, figures);
     }
 
-    @Test(expectedExceptions = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void shouldNotAllowConstructingGroupingManagerWithNullFigures() {
         new GroupingManager(drawingView, group, null);
     }
