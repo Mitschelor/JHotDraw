@@ -64,5 +64,11 @@
             <version>1.0.0-RC6</version>
             <scope>test</scope>
         </dependency>
-    </dependencies>
+		<dependency>
+			<groupId>com.tngtech.jgiven</groupId>
+			<artifactId>jgiven-core</artifactId>
+			<version>1.0.0-RC6</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 </project>
