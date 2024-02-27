@@ -74,13 +74,13 @@ public class UngroupActionTest {
 
 
     @Test
-    public void shouldNotGroupWhenCanUngroupIsFalse() {
+    public void shouldNotUnGroupWhenCanUngroupIsFalse() {
         setUpCanUngroup(false);
         UngroupAction ungroupAction = spy(new UngroupAction(editor, prototype, groupingManager));
         ungroupAction.actionPerformed(null);
 
         verify(ungroupAction, times(1)).canUngroup();
-        verify(view, times(2)).getSelectedFigures();
+        verify(view, never()).getSelectedFigures();
         verify(groupingManager, never()).ungroupFigures();
         verify(ungroupAction, never()).fireUndoableEditHappened(any());
     }
