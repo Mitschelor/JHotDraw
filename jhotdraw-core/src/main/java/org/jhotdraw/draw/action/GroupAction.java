@@ -25,52 +25,72 @@ import java.util.LinkedList;
  */
 public class GroupAction extends AbstractSelectedAction {
 
-  private static final long serialVersionUID = 1L;
-  public static final String ID = "edit.groupSelection";
+    private static final long serialVersionUID = 1L;
+    public static final String ID = "edit.groupSelection";
 
-  private final CompositeFigure prototype;
+    private final CompositeFigure prototype;
 
-  /**
-   * Creates a new instance.
-   */
-  @FeatureEntryPoint("Grouping")
-  public GroupAction(DrawingEditor editor) {
-    this(editor, new GroupFigure());
-  }
+    private GroupingManager groupingManager;
 
-  @FeatureEntryPoint("Grouping")
-  public GroupAction(DrawingEditor editor, CompositeFigure prototype) {
-    super(editor);
-    this.prototype = prototype;
-    ResourceBundleUtil labels
-            = ResourceBundleUtil.getBundle("org.jhotdraw.draw.Labels");
-    labels.configureAction(this, ID);
-    updateEnabledState();
-  }
-
-
-  @Override
-  protected void updateEnabledState() {
-    setEnabled(canGroup());
-  }
-
-  protected boolean canGroup() {
-    return getView() != null && getView().getSelectionCount() > 1;
-  }
-
-  @Override
-  @FeatureEntryPoint("Grouping")
-  public void actionPerformed(java.awt.event.ActionEvent e) {
-    if (canGroup()) {
-      final DrawingView view = getView();
-      final LinkedList<Figure> ungroupedFigures = new LinkedList<>(
-              view.getSelectedFigures());
-      final CompositeFigure group = (CompositeFigure) prototype.clone();
-      GroupingManager groupingManager = new GroupingManager(view, group,
-              ungroupedFigures);
-      UndoableGroupEdit edit = new UndoableGroupEdit(groupingManager);
-      groupingManager.groupFigures();
-      fireUndoableEditHappened(edit);
+    /**
+     * Creates a new instance.
+     */
+    @FeatureEntryPoint("Grouping")
+    public GroupAction(DrawingEditor editor) {
+        this(editor, new GroupFigure());
     }
-  }
+
+    @FeatureEntryPoint("Grouping")
+    public GroupAction(DrawingEditor editor, CompositeFigure prototype) {
+        super(editor);
+        if (editor == null || prototype == null) {
+            throw new IllegalArgumentException("editor and prototype must be nonnull");
+        }
+        this.prototype = prototype;
+        ResourceBundleUtil labels
+                = ResourceBundleUtil.getBundle("org.jhotdraw.draw.Labels");
+        labels.configureAction(this, ID);
+        updateEnabledState();
+    }
+
+    public GroupAction(DrawingEditor editor, CompositeFigure prototype, GroupingManager groupingManager) {
+        super(editor);
+        if (editor == null || prototype == null || groupingManager == null) {
+            throw new IllegalArgumentException("editor, prototype and groupingManager must be nonnull");
+        }
+        this.prototype = prototype;
+        this.groupingManager = groupingManager;
+        ResourceBundleUtil labels
+                = ResourceBundleUtil.getBundle("org.jhotdraw.draw.Labels");
+        labels.configureAction(this, ID);
+        updateEnabledState();
+    }
+
+
+    @Override
+    protected void updateEnabledState() {
+        setEnabled(canGroup());
+    }
+
+    protected boolean canGroup() {
+        return getView() != null && getView().getSelectionCount() > 1;
+    }
+
+    @Override
+    @FeatureEntryPoint("Grouping")
+    public void actionPerformed(java.awt.event.ActionEvent e) {
+        if (canGroup()) {
+            final DrawingView view = getView();
+            final LinkedList<Figure> ungroupedFigures = new LinkedList<>(
+                    view.getSelectedFigures());
+            final CompositeFigure group = (CompositeFigure) prototype.clone();
+            if (groupingManager == null) {
+                groupingManager = new GroupingManager(view, group,
+                        ungroupedFigures);
+            }
+            UndoableGroupEdit edit = new UndoableGroupEdit(groupingManager);
+            groupingManager.groupFigures();
+            fireUndoableEditHappened(edit);
+        }
+    }
 }
