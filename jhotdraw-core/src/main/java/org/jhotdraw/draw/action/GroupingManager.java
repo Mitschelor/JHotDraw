@@ -44,15 +44,15 @@ public class GroupingManager implements Serializable {
     }
 
     public Collection<Figure> ungroupFigures() {
-        LinkedList<Figure> figures = new LinkedList<>(group.getChildren());
-        if (figures.isEmpty()) {
-            return figures;
+        LinkedList<Figure> groupChildren = new LinkedList<>(group.getChildren());
+        if (groupChildren.isEmpty()) {
+            return groupChildren;
         }
         view.clearSelection();
         group.basicRemoveAllChildren();
-        view.getDrawing().basicAddAll(view.getDrawing().indexOf(group), figures);
+        view.getDrawing().basicAddAll(view.getDrawing().indexOf(group), groupChildren);
         view.getDrawing().remove(group);
-        view.addToSelection(figures);
-        return figures;
+        view.addToSelection(groupChildren);
+        return groupChildren;
     }
 }
